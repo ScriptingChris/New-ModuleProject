@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 
-1.2.8
+1.3.9
 
 .GUID 
 55ef3a83-4365-4e5e-844b-6ab2d323963b
@@ -36,8 +36,15 @@ https://github.com/ScriptingChris/New-ModuleProject
 
 
 .RELEASENOTES
-Created a lot of bug fixes to the build.ps1 script.
-Added the the process of exporting aliases from the public functions aswell
+For Release: 1.3.9:
+    Added the build functionality Swtich for compiling all Documentations into the README.md file.
+    If the switch -ReadMeDocs has been added to the Invoke-Build command then the build file will
+    get all content from the Docs folder and append it to the README.md file. This way you can
+    have an easy way of generating a simple documentation for your module to display on GitHub.
+
+    There has also been added the functionality when creating a new module project. It will generate
+    .gitkeep files in all empty folders. This way when you add the module repository to source control
+    it will upload the entire folder structure.
 
 
 Help documentation and use cases for the Script can be found here:
