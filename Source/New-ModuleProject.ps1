@@ -113,6 +113,8 @@ Param(
     [Parameter(Mandatory=$false)][Switch]$Scripts
 )
 
+# Todo - Create .gitkeep files in all the folders the first time they are beeing created
+
 #Region - Prerequisites
 if($Prerequisites.IsPresent){
     Write-Verbose -Message "Initializing Module PowerSehllGet"
@@ -164,7 +166,7 @@ if($Initialize.IsPresent){
             New-Item -Path "$($Path)\$($ModuleName)\Source" -ItemType Directory
             New-Item -Path "$($Path)\$($ModuleName)\Tests" -ItemType Directory
             New-Item -Path "$($Path)\$($ModuleName)\Output" -ItemType Directory
-            New-Item -Path "$($Path)\$($ModuleName)\Docs" -ItemType Directory    
+            New-Item -Path "$($Path)\$($ModuleName)\Docs" -ItemType Directory
         }
         catch {
             Write-Error -Message "Error - Failed creating Source, Test, Output and Docs folder"
@@ -177,6 +179,34 @@ if($Initialize.IsPresent){
         }
         catch {
             Write-Error -Message "Error - Failed creating private and public functions folders"
+        }
+
+        # Todo - test if this works ...
+        Write-Verbose -Message "Creating gitkeep files"
+        $folders = Get-ChildItem $Path\$ModuleName | Where-Object Mode -eq d----
+        foreach ($folder in $folders){
+            Write-Verbose -Message "Looking in folder: $($folder.Name)"
+            $subFolders = Get-ChildItem "$($Path)\$($ModuleName)\$($folder.Name)" | Where-Object Mode -eq d----
+            if($subFolders){
+                foreach($f in $subFolders){
+                    try {
+                        Write-Verbose -Message "Creating subfolder file: $($Path)\$($ModuleName)\$($folder.Name)\$($f.Name)\.gitkeep"
+                        New-Item -Path "$($Path)\$($ModuleName)\$($folder.Name)\$($f.Name)\.gitkeep" -ItemType File
+                    }
+                    catch{
+                        Write-Error "$($_)"
+                    }
+                }
+            }
+            else {
+                try {
+                    Write-Verbose -Message "Creating file: $($Path)\$($ModuleName)\$($folder.Name)\.gitkeep"
+                    New-Item -Path "$($Path)\$($ModuleName)\$($folder.Name)\.gitkeep" -ItemType File
+                }
+                catch{
+                    Write-Error "$($_)"
+                }
+            }
         }
     }
 }
