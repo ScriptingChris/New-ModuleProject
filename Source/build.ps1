@@ -1,8 +1,11 @@
 param (
     [ValidateSet("Release", "debug")]$Configuration = "debug",
     [Parameter(Mandatory=$false)][String]$NugetAPIKey,
-    [Parameter(Mandatory=$false)][Switch]$ExportAlias
+    [Parameter(Mandatory=$false)][Switch]$ExportAlias,
+    [Parameter(Mandatory=$false)][Switch]$ReadMeDocs
 )
+
+#Todo - Create a compiling of the readme file with all the docs
 
 task Init {
     Write-Verbose -Message "Initializing Module PSScriptAnalyzer"

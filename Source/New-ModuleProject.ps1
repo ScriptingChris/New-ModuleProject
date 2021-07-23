@@ -113,7 +113,6 @@ Param(
     [Parameter(Mandatory=$false)][Switch]$Scripts
 )
 
-# Todo - Create .gitkeep files in all the folders the first time they are beeing created
 
 #Region - Prerequisites
 if($Prerequisites.IsPresent){
@@ -181,7 +180,7 @@ if($Initialize.IsPresent){
             Write-Error -Message "Error - Failed creating private and public functions folders"
         }
 
-        # Todo - test if this works ...
+        
         Write-Verbose -Message "Creating gitkeep files"
         $folders = Get-ChildItem $Path\$ModuleName | Where-Object Mode -eq d----
         foreach ($folder in $folders){
