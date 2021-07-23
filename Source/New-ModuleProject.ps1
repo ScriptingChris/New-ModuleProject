@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 
-1.2.8
+1.3.9
 
 .GUID 
 55ef3a83-4365-4e5e-844b-6ab2d323963b
@@ -36,8 +36,15 @@ https://github.com/ScriptingChris/New-ModuleProject
 
 
 .RELEASENOTES
-Created a lot of bug fixes to the build.ps1 script.
-Added the the process of exporting aliases from the public functions aswell
+For Release: 1.3.9:
+    Added the build functionality Swtich for compiling all Documentations into the README.md file.
+    If the switch -ReadMeDocs has been added to the Invoke-Build command then the build file will
+    get all content from the Docs folder and append it to the README.md file. This way you can
+    have an easy way of generating a simple documentation for your module to display on GitHub.
+
+    There has also been added the functionality when creating a new module project. It will generate
+    .gitkeep files in all empty folders. This way when you add the module repository to source control
+    it will upload the entire folder structure.
 
 
 Help documentation and use cases for the Script can be found here:
@@ -113,6 +120,7 @@ Param(
     [Parameter(Mandatory=$false)][Switch]$Scripts
 )
 
+
 #Region - Prerequisites
 if($Prerequisites.IsPresent){
     Write-Verbose -Message "Initializing Module PowerSehllGet"
@@ -164,7 +172,7 @@ if($Initialize.IsPresent){
             New-Item -Path "$($Path)\$($ModuleName)\Source" -ItemType Directory
             New-Item -Path "$($Path)\$($ModuleName)\Tests" -ItemType Directory
             New-Item -Path "$($Path)\$($ModuleName)\Output" -ItemType Directory
-            New-Item -Path "$($Path)\$($ModuleName)\Docs" -ItemType Directory    
+            New-Item -Path "$($Path)\$($ModuleName)\Docs" -ItemType Directory
         }
         catch {
             Write-Error -Message "Error - Failed creating Source, Test, Output and Docs folder"
@@ -177,6 +185,34 @@ if($Initialize.IsPresent){
         }
         catch {
             Write-Error -Message "Error - Failed creating private and public functions folders"
+        }
+
+        
+        Write-Verbose -Message "Creating gitkeep files"
+        $folders = Get-ChildItem $Path\$ModuleName | Where-Object Mode -eq d----
+        foreach ($folder in $folders){
+            Write-Verbose -Message "Looking in folder: $($folder.Name)"
+            $subFolders = Get-ChildItem "$($Path)\$($ModuleName)\$($folder.Name)" | Where-Object Mode -eq d----
+            if($subFolders){
+                foreach($f in $subFolders){
+                    try {
+                        Write-Verbose -Message "Creating subfolder file: $($Path)\$($ModuleName)\$($folder.Name)\$($f.Name)\.gitkeep"
+                        New-Item -Path "$($Path)\$($ModuleName)\$($folder.Name)\$($f.Name)\.gitkeep" -ItemType File
+                    }
+                    catch{
+                        Write-Error "$($_)"
+                    }
+                }
+            }
+            else {
+                try {
+                    Write-Verbose -Message "Creating file: $($Path)\$($ModuleName)\$($folder.Name)\.gitkeep"
+                    New-Item -Path "$($Path)\$($ModuleName)\$($folder.Name)\.gitkeep" -ItemType File
+                }
+                catch{
+                    Write-Error "$($_)"
+                }
+            }
         }
     }
 }

@@ -1,8 +1,11 @@
 param (
     [ValidateSet("Release", "debug")]$Configuration = "debug",
     [Parameter(Mandatory=$false)][String]$NugetAPIKey,
-    [Parameter(Mandatory=$false)][Switch]$ExportAlias
+    [Parameter(Mandatory=$false)][Switch]$ExportAlias,
+    [Parameter(Mandatory=$false)][Switch]$ReadMeDocs
 )
+
+#Todo - Create a compiling of the readme file with all the docs
 
 task Init {
     Write-Verbose -Message "Initializing Module PSScriptAnalyzer"
@@ -294,7 +297,7 @@ task Build -if($Configuration -eq "Release"){
     }
 
     if(!(Get-ChildItem -Path ".\Docs")){
-        Write-Verbose -Message "Docs folder is empty, generating new fiiles"
+        Write-Verbose -Message "Docs folder is empty, generating new files"
         if(Get-Module -Name $($ModuleName)) {
             Write-Verbose -Message "Module: $($ModuleName) is imported into session, generating Help Files"
             New-MarkdownHelp -Module $ModuleName -OutputFolder ".\Docs"
@@ -314,7 +317,27 @@ task Build -if($Configuration -eq "Release"){
             New-ExternalHelp ".\Docs" -OutputPath ".\Output\$($ModuleName)\$($ModuleVersion)\en-US\"
         }
     }
-
+    if($ReadMeDocs.IsPresent){
+        Write-Verbose -Message "Compiling README file"
+        $docFolders = Get-ChildItem ".\Docs\"
+        foreach($folder in $docFolders){
+            if($folder.Name -match "about_*"){
+                $content = Get-Content -Path ".\Docs\$($folder.Name)"
+                Add-Content ".\README.md" -Value $content
+                Add-Content ".\README.md" -Value "<br>"
+                Add-Content ".\README.md" -Value "<hr>"
+                Add-Content ".\README.md" -Value "<br>"
+            }
+        }
+        foreach($folder in $docFolders){
+            if($folder.Name -notmatch "about*"){
+                $content = Get-Content -Path ".\Docs\$($folder.Name)"
+                Add-Content ".\README.md" -Value $content
+                Add-Content ".\README.md" -Value "<br>"
+                Add-Content ".\README.md" -Value "<br>"
+            }
+        }
+    }
 
 }
 
